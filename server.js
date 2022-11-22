@@ -9,7 +9,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 //Include all files in the public folder.
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, ''))); //CHANGE THIS LATER FOR SECURITY PURPOSES
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use("/", router);
@@ -34,6 +34,7 @@ function loadIt(filename) {
   return $;
 };
 
+/*
 function checkLogin(email, pw, res) {
   var insert = [];
   insert.push(email);
@@ -46,10 +47,35 @@ function checkLogin(email, pw, res) {
       res.send(result == resp.rows[0].pwhash);
     }
   });
-}
+}*/
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname+'/index.html'));
+});
+
+app.post('/signup', (req, res) => {
+  client.query('SELECT user_id FROM users WHERE email=$1;', [req.body.email], (err1, res1) => {
+      if(res1.rows.length != 0){
+        var errstring = 'User already exists.';
+        var $ = loadIt('/signup.html');
+        $('div#errorspace').html(errstring);
+        responseString = $.html();
+        res.send(responseString);
+      }else if(req.body.pw != req.body.pw2){
+        var errstring = 'Passwords do not match.';
+        var $ = loadIt('/signup.html');
+        $('div#errorspace').html(errstring);
+        responseString = $.html();
+        res.send(responseString);
+      }else{
+        var salt = crypto.createHash('md5').update(Math.random().toString()).digest('hex').slice(0,10);
+        var pwhash = crypto.createHash('md5').update(salt+req.body.pw).digest('hex');
+        client.query('INSERT INTO users(email, salt, pwhash, fname, lname, office) VALUES ($1, $2, $3, $4, $5, $6);', [req.body.email, salt, pwhash, req.body.fname, req.body.lname, req.body.office], (err2, res2) => {
+          //add more
+          res.sendFile(path.join(__dirname+'/dashboard.html'));
+        });
+      }
+  });
 });
 
 app.get('/env', (req,res) => {
@@ -61,7 +87,7 @@ app.get('/test', (req, res) => {
   checkLogin('r.m.pettibone@gmail.com', 'password', res);
 });
 
-//This tests that cheerio can load a file already in the database, 
+//This tests that cheerio can load a file 
 app.get('/cheeriotest', (req, res) => {
   var $ = loadIt('/index.html');
   $('div.footer').html('New footer!');
@@ -70,11 +96,11 @@ app.get('/cheeriotest', (req, res) => {
 });
 
 app.get('/dbtst', (req, res) => {
-    client.query('SELECT * FROM activities;', (err, resp) => {
+    client.query('SELECT * FROM users;', (err, resp) => {
         if (err) {
           res.send('Could not connect to db');
         } else {
-          res.send(resp.rows[0].act_name);
+          res.send(resp.rows[0].email);
         }
       });
 });
@@ -83,40 +109,6 @@ app.listen(process.env.PORT || 3000);
 
 
 /*
-app.get('/', function (request, response) {
-  response.set('Content-Type', 'text/html');
-  var errorString = '<html lang="en"><head><title>Error</title></head><body><h2>Something is wrong with the database!</h2></body></html>';
-  var responseString = '<html lang="en"><head><title>Vehicles and Riders</title></head><body>';
-  
-  client.query('SELECT * FROM cars', (error1, result1) => {
-		if (!error1) {
-      responseString += '<h1>Cars</h1><table><tr><th>Username</th><th>Lat</th><th>Lng</th></tr>';
-      for (let i = 0; i < result1.rows.length; i++) {
-        responseString += '<tr><td>' + result1.rows[i].username + '</td><td>' + result1.rows[i].lat + '</td><td>' + result1.rows[i].lng + '</td></tr>';
-      }
-      responseString += '</table>';
-      client.query('SELECT * FROM riders', (error2, result2) => {
-        if (!error2) {
-          responseString += '<h1>Riders</h1><table><tr><th>Username</th><th>Lat</th><th>Lng</th></tr>';
-          for (let i = 0; i < result2.rows.length; i++) {
-            responseString += '<tr><td>' + result2.rows[i].username + '</td><td>' + result2.rows[i].lat + '</td><td>' + result2.rows[i].lng + '</td></tr>';
-          }
-          responseString += '</table></body></html>';
-          response.send(responseString);
-        }
-        else {
-          response.send(errorString);
-        }
-      });
-
-		}
-		else {
-			response.send(errorString);
-		}
-	});
-
-
-
 router.post('/riders', function (request, response) {
   response.header("Access-Control-Allow-Origin", "*");
   response.header("Access-Control-Allow-Headers", "*");
