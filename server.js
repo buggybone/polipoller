@@ -55,26 +55,41 @@ app.get('/', (req, res) => {
 
 app.post('/signup', (req, res) => {
   client.query('SELECT user_id FROM users WHERE email=$1;', [req.body.email], (err1, res1) => {
-      if(res1.rows.length != 0){
-        var errstring = 'User already exists.';
-        var $ = loadIt('/signup.html');
-        $('div#errorspace').html(errstring);
-        responseString = $.html();
-        res.send(responseString);
-      }else if(req.body.pw != req.body.pw2){
-        var errstring = 'Passwords do not match.';
-        var $ = loadIt('/signup.html');
-        $('div#errorspace').html(errstring);
-        responseString = $.html();
-        res.send(responseString);
-      }else{
-        var salt = crypto.createHash('md5').update(Math.random().toString()).digest('hex').slice(0,10);
-        var pwhash = crypto.createHash('md5').update(salt+req.body.pw).digest('hex');
-        client.query('INSERT INTO users(email, salt, pwhash, fname, lname, office) VALUES ($1, $2, $3, $4, $5, $6);', [req.body.email, salt, pwhash, req.body.fname, req.body.lname, req.body.office], (err2, res2) => {
-          //add more
-          res.sendFile(path.join(__dirname+'/dashboard.html'));
-        });
-      }
+    if(res1.rows.length != 0){
+      var errstring = 'User already exists.';
+      var $ = loadIt('/signup.html');
+      $('div.errorspace').html(errstring);
+      responseString = $.html();
+      res.send(responseString);
+    }else if(req.body.pw != req.body.pw2){
+      var errstring = 'Passwords do not match.';
+      var $ = loadIt('/signup.html');
+      $('div#errorspace').html(errstring);
+      responseString = $.html();
+      res.send(responseString);
+    }else{
+      var salt = crypto.createHash('md5').update(Math.random().toString()).digest('hex').slice(0,10);
+      var pwhash = crypto.createHash('md5').update(salt+req.body.pw).digest('hex');
+      client.query('INSERT INTO users(email, salt, pwhash, fname, lname, office) VALUES ($1, $2, $3, $4, $5, $6);', [req.body.email, salt, pwhash, req.body.fname, req.body.lname, req.body.office], (err2, res2) => {
+        //add more
+        res.sendFile(path.join(__dirname+'/dashboard.html'));
+      });
+    }
+  });
+});
+
+app.post('/signin', (req, res) => {
+  client.query('SELECT email, salt, pwhash FROM users WHERE email=$1;', [req.body.email], (err1, res1) => {
+    var something_wrong = (res1.rows.length == 0)||(crypto.createHash('md5').update(res1.rows[0].salt+req.body.pw).digest('hex') != res1.rows[0].pwhash);
+    if(something_wrong){
+      var errstring = 'There was a problem with your login credentials.';
+      var $ = loadIt('/signin.html');
+      $('div.errorspace').html(errstring);
+      responseString = $.html();
+      res.send(responseString);
+    }else{
+      res.sendFile(path.join(__dirname+'/dashboard.html'));
+    }
   });
 });
 
