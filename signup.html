@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<head>
+    <title>Sign Up with PoliPoller!</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>Sign Up</h1>
+    <form action="/signup" method="POST">
+        <fieldset>
+          <h3>Create a PoliPoller Account Here:</h3>
+          <label>Email Address:</label>
+          <br>
+          <input type="text" class="my_input" name="email" required>
+          <br><br>
+          <label>Password:</label>
+          <br>
+          <input type="password" class="my_input" name="pw" required>
+          <br><br>
+          <label>Re-Type Password:</label>
+          <br>
+          <input type="password" class="my_input" name="pw2" required>
+          <br><br>
+          <label>First Name:</label>
+          <br>
+          <input type="text" class="my_input" name="fname" required>
+          <br><br>
+          <label>Last Name:</label>
+          <br>
+          <input type="text" class="my_input" name="lname" required>
+          <br><br>
+          <label>Office Held/Running For:</label>
+          <br>
+          <input type="text" class="my_input" name="office" required>
+          <br><br>
+          <button type ="reset">Reset</button>
+          <button type ="submit">Submit</button>
+          <br><br><br>
+        </fieldset>
+    </form>
+    <button onclick="window.location.href='./index.html';">
+        Back to Home
+    </button>
+</body>
+</html>
