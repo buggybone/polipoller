@@ -21,3 +21,11 @@ CREATE TABLE questions (
 CREATE TABLE numbers(
 
 ); 	
+
+dashboard should...
+display info about user
+poll create
+view poll status
+
+
+

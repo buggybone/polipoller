@@ -7,6 +7,8 @@ const { Client } = require('pg');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const crypto = require('crypto');
+const client2 = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const MY_NUMBER = '+14302491085';
 
 //Include all files in the public folder.
 app.use(express.static(path.join(__dirname, ''))); //CHANGE THIS LATER FOR SECURITY PURPOSES
@@ -64,7 +66,7 @@ app.post('/signup', (req, res) => {
     }else if(req.body.pw != req.body.pw2){
       var errstring = 'Passwords do not match.';
       var $ = loadIt('/signup.html');
-      $('div#errorspace').html(errstring);
+      $('div.errorspace').html(errstring);
       responseString = $.html();
       res.send(responseString);
     }else{
@@ -93,31 +95,13 @@ app.post('/signin', (req, res) => {
   });
 });
 
-app.get('/env', (req,res) => {
-  resp = process.env.DATABASE_URL.toString();
-  res.send(resp);
-});
-
-app.get('/test', (req, res) => {
-  checkLogin('r.m.pettibone@gmail.com', 'password', res);
-});
-
-//This tests that cheerio can load a file 
-app.get('/cheeriotest', (req, res) => {
-  var $ = loadIt('/index.html');
-  $('div.footer').html('New footer!');
-  responseString = $.html();
-  res.send(responseString);
-});
-
-app.get('/dbtst', (req, res) => {
-    client.query('SELECT * FROM users;', (err, resp) => {
-        if (err) {
-          res.send('Could not connect to db');
-        } else {
-          res.send(resp.rows[0].email);
-        }
-      });
+app.get('/twiliotest', (req, res) => {
+  client2.messages
+  .create({
+     body: 'It works!',
+     from: MY_NUMBER,
+     to: '+14257607569'
+   });
 });
 
 app.listen(process.env.PORT || 3000);
