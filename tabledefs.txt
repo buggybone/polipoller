@@ -3,7 +3,7 @@ CREATE TABLE users (
 	email VARCHAR(60) NOT NULL,
 	salt VARCHAR(10) NOT NULL,
 	pwhash VARCHAR(32) NOT NULL,
-	fname VARCHAR(20) NOT NULL,
+	fname VARCHAR(20) NOT NULL,DROP 
 	lname VARCHAR(30) NOT NULL,
 	office VARCHAR(40) NOT NULL
 );
@@ -11,21 +11,37 @@ CREATE TABLE users (
 CREATE TABLE polls (
 	poll_id SERIAL PRIMARY KEY,
 	owner INT NOT NULL,
+	poll_name VARCHAR(60) NOT NULL,
+	question VARCHAR(150) NOT NULL, 
 	CONSTRAINT fk1 FOREIGN KEY(owner) REFERENCES users(user_id)
 );
 
-CREATE TABLE questions (
-
+CREATE TABLE responses (
+	poll_id	INT NOT NULL,
+	resp_id INT NOT NULL,
+	resp INT NOT NULL,
+	gender INT NOT NULL,
+	age INT NOT NULL,
+	ethnicity INT NOT NULL,
+	party INT NOT NULL,
+	PRIMARY KEY(poll_id, resp_id),
+	CONSTRAINT fk1 FOREIGN KEY(poll_id) REFERENCES polls(poll_id)
 );	
+	
 
-CREATE TABLE numbers(
 
-); 	
+
 
 dashboard should...
 display info about user
 poll create
 view poll status
+
+WHAT IS YOUR GENDER? Male, Female, Non-Binary, Prefer Not To Say
+What IS YOUR POLITICAL PARTY AFFILIATION? Democratic, Republican, Other, Prefer not to say
+AGE RANGE: 18-24, 25-39, 40-64, 64+, Prefer not to say
+HOW WOULD YOU BEST DESCRIBE YOURSELF? Asian/Pacific Islander, Black or African American, Hispanic or Latino, Native American or American Indian, White, Other, Prefer Not to Say
+
 
 
 

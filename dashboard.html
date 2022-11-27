@@ -8,6 +8,15 @@
     <button onclick="window.location.href='/createpoll.html';">
         Create New Poll
     </button>
+    <form action="/pollpage" method="POST">
+        <label for="polls">View a Past Poll's Results</label>
+        <select name="languages" id="lang">
+          <option value="p1">Poll 1</option>
+          <option value="p2">Poll 2</option>
+          <option value="p3">Poll 3</option>
+        </select>
+        <input type="submit" value="View" />
+    </form>
 
 </body>
 </html>
