@@ -29,6 +29,7 @@ CREATE TABLE responses (
 );	
 	
 
+CREATE TABLE sessions (
 
 
 
