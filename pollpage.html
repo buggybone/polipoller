@@ -1,34 +1,71 @@
 <!DOCTYPE html>
-<html>
 <head>
-    <title>PoliPoll Results</title>
-    <meta charset="utf-8" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Please Fill Out This PoliPoll!</title>
+    <meta charset="utf-8">
 </head>
 <body>
-    <h1>Hi</h1>
-    Polls Sent:
-    Responses Received:
-    Response Rate:
-    Overall Results:
-    Results by Age:
-    Results by Gender:
-    Results by Ethnicity:
-    Results by Party Affiliation:
-    
-    <canvas id="myChart"></canvas>
-    <script>
-        const ctx = document.getElementById('myChart');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                borderWidth: 1 }]
-            }
-        });
-    </script>
+    <h1>Here's Your PoliPoll!</h1>
+    <div class="errorspace"></div>
+    <form action="/pollresponse" method="POST">
+        <label for="question" id="question">Question Text Here</label><br>
+        <select class="dropdown" name="question">
+            <option value="-1">--Select an Option--</option>
+            <option value="0">Yes</option>
+            <option value="1">No</option>
+            <option value="6">I prefer to not respond.</option>
+        </select>
+        <br><br>
+
+        <label for="gender" class="pollquestion">What is your gender?</label><br>
+        <select class="dropdown" name="gender">
+            <option value="-1">--Select an Option--</option>
+            <option value="0">Male</option>
+            <option value="1">Female</option>
+            <option value="2">Non-Binary</option>
+            <option value="6">I prefer to not respond.</option>
+        </select>
+        <br><br>
+
+        <label for="age" class="pollquestion">What is your age range?</label><br>
+        <select class="dropdown" name="age">
+            <option value="-1">--Select an Option--</option>
+            <option value="0">18-24</option>
+            <option value="1">25-39</option>
+            <option value="2">40-64</option>
+            <option value="3">65+</option>
+            <option value="6">I prefer to not respond.</option>
+        </select>
+        <br><br>
+
+        <label for="ethnicity" class="pollquestion">How would you best describe yourself?</label><br>
+        <select class="dropdown" name="ethnicity">
+            <option value="-1">--Select an Option--</option>
+            <option value="0">Asian/Pacific Islander</option>
+            <option value="1">Black or African American</option>
+            <option value="2">Hispanic or Latino</option>
+            <option value="3">Native American or American Indian</option>
+            <option value="4">White</option>
+            <option value="5">Other</option>
+            <option value="6">I prefer to not respond.</option>
+        </select>
+        <br><br>
+
+
+        <label for="party" class="pollquestion">What is your political party affiliation?</label><br>
+        <select class="dropdown" name="party">
+            <option value="-1">--Select an Option--</option>
+            <option value="0">Democratic</option>
+            <option value="1">Republican</option>
+            <option value="2">Other</option>
+            <option value="6">I prefer to not respond.</option>
+        </select>
+        <br><br>
+
+        <button type ="reset">Reset</button>
+        <br><br>
+
+        <button type ="submit">Submit</button>
+    </form>
+
 </body>
 </html>

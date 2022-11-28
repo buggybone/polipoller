@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PoliPoll Results</title>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function grapher(iden, labs, ds){
+            console.log(labs);
+            console.log(ds);
+            var x = [];
+            for(var i = 0; i < ds.length; i++){
+                var y = {
+                    data: ds[i],
+                    borderWidth: 1
+                }
+                x.push(y);
+            }
+            console.log(x);
+            var mydata = {
+                    labels: labs,
+                    datasets: x
+            }
+            var ctx = document.getElementById(iden);
+            new Chart(ctx, {
+                type: 'bar',
+                data: mydata
+            });
+        }
+        /*[{
+                    //label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    borderWidth: 1 }]*/
+    </script>
+</head>
+<body>
+    <h1>Poll Results</h1>
+    Polls Sent:
+    Responses Received:
+    Response Rate:
+    <h2>Overall Results:</h2>
+    <canvas id="totals"></canvas>
+    <h2>Results by Gender:</h2>
+    <canvas id="gender"></canvas>
+    <h2>Results by Age:</h2>
+    <canvas id="age"></canvas>
+    <h2> Results by Ethnicity:</h2>
+    <canvas id="ethnicity"></canvas>
+    <h2>Results by Party Affiliation:</h2>
+    <canvas id="party"></canvas>
+    
+    <script id="insert"></script>
+</body>
+</html>

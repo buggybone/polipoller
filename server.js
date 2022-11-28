@@ -104,38 +104,117 @@ app.get('/twiliotest', (req, res) => {
    });
 });
 
-app.listen(process.env.PORT || 3000);
-
-
-/*
-router.post('/riders', function (request, response) {
-  response.header("Access-Control-Allow-Origin", "*");
-  response.header("Access-Control-Allow-Headers", "*");
-  var errorBool = request.body.username == null || request.body.lat == null || request.body.lng == null;
-  if(errorBool){
-    var errorString = '{"error":"Whoops, something is wrong with your data!"}';
-    response.send(errorString);
-    return;
-  }
-
-
-	client.query('SELECT * FROM riders', (error, result) => {
-		if (!error) {
-      var responseString;
-			for (let i = 0; i < result.rows.length; i++) {
-        if(i == 0){ responseString = '[';}
-        var jsonString = '{"username": "' + result.rows[i].username + '", "lat": ' + result.rows[i].lat + ', "lng": ' + result.rows[i].lng + '}';
-        responseString += jsonString;
-        if(i < result.rows.length-1){responseString += ',';}
-        else {responseString += ']';}
-			}
-      response.send(responseString);
-		}
-		else {
-      var errorString = '{"error":"Whoops, something is wrong with the database!"}';
-			response.send(errorString);
-		}
-	});
+app.get('/pollpage', (req, res) => {
+  client.query('SELECT question FROM polls WHERE poll_id=1', (req1, res1) => {
+    var q = res1.rows[0].question;
+    var $ = loadIt('/pollpage.html');
+    $('#question').html(q);
+    res.send($.html());
+  });
 });
 
-*/
+app.post('/pollresponse', (req, res) => {
+  client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [1,  Math.floor(Math.random() * 10000), req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party], (err1, res1) => {
+    res.send('Thank you for your response!');
+  });
+});
+
+app.get('/pollresultspage', (req, res) => {
+  client.query('SELECT * FROM responses WHERE poll_id=1', (req1, res1) => {
+    var total = [0,0,0];
+    var gendata = [[0,0,0],[0,0,0],[0,0,0]];
+    var pardata = [[0,0,0],[0,0,0],[0,0,0]];
+    var agedata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
+    var ethdata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
+
+    for(var i = 0; i < res1.rows.length; i++){
+      var row = res1.rows[i];
+      var ans = parseInt(row.resp);
+      if(ans != -1 && ans != 6){
+        total[2]++;
+        total[ans]++;
+
+        var gencode = parseInt(row.gender);
+        if(gencode != -1 && gencode != 6){
+          gendata[gencode][2]++;
+          gendata[gencode][ans]++;
+        }
+
+        var agecode = parseInt(row.age);
+        if(agecode != -1 && agecode != 6){
+          agedata[agecode][2]++;
+          agedata[agecode][ans]++;
+        }
+
+        var ethcode = parseInt(row.ethnicity);
+        if(ethcode != -1 && ethcode != 6){
+          ethdata[ethcode][2]++;
+          ethdata[ethcode][ans]++;
+        }
+
+        var parcode = parseInt(row.party);
+        if(parcode != -1 && parcode != 6){
+          pardata[parcode][2]++;
+          pardata[parcode][ans]++;
+        }
+      }
+    }
+
+    var totresults = [0,0];
+    if(total[2] != 0){
+      totresults[0] = total[0]/total[2]*100;
+      totresults[1] = total[1]/total[2]*100;
+    }
+    var genresults = [[0,0,0],[0,0,0]];
+    for(var i = 0; i < gendata.length; i++){
+      if(gendata[i][2] != 0){
+        genresults[0][i]= gendata[i][0]/gendata[i][2]*100;
+        genresults[1][i] = gendata[i][1]/gendata[i][2]*100;
+      }
+    }
+    genresults = JSON.stringify(genresults);
+    var genlabels = JSON.stringify(['Male', 'Female', 'Non-Binary']);
+   
+    var parresults = [[0,0,0],[0,0,0]]
+    for(var i = 0; i < pardata.length; i++){
+      if(pardata[i][2] != 0){
+        parresults[0][i] = pardata[i][0]/pardata[i][2]*100;
+        parresults[1][i] = pardata[i][1]/pardata[i][2]*100;
+      }
+    }
+    parresults = JSON.stringify(parresults);
+    var parlabels = JSON.stringify(['Democrat', 'Republican', 'Other']);
+
+    var ageresults = [[0,0,0,0],[0,0,0,0]];
+    for(var i = 0; i < agedata.length; i++){
+      if(agedata[i][2] != 0){
+        ageresults[0][i] = agedata[i][0]/agedata[i][2]*100;
+        ageresults[1][i] = agedata[i][1]/agedata[i][2]*100;
+      }
+    }
+    ageresults = JSON.stringify(ageresults);
+    var agelabels = JSON.stringify(['18-24','25-39','40-64','65+']);
+
+    var ethresults = [[0,0,0,0,0,0],[0,0,0,0,0,0]];
+    for(var i = 0; i < ethdata.length; i++){
+      if(ethdata[i][2] != 0){
+        ethresults[0][i] = ethdata[i][0]/ethdata[i][2]*100;
+        ethresults[0][i] = ethdata[i][1]/ethdata[i][2]*100;
+      }
+    }
+    ethresults = JSON.stringify(ethresults);
+    var ethlabels = JSON.stringify(['Asian/Pacific Islander', 'Black or African American', 'Hispanic or Latino', 'Native American or American Indian', 'White', 'Other']);
+    
+    var $ = loadIt('/pollresultspage.html');
+    $('#insert').html('grapher("gender",'+ genlabels +  ',' + genresults + ');' +
+                      'grapher("age",'+ agelabels +  ',' + ageresults + ');' +
+                      'grapher("party",'+ parlabels +  ',' + parresults + ');' +
+                      'grapher("ethnicity",'+ ethlabels +  ',' + ethresults + ');' 
+                );
+    res.send($.html());
+
+  });
+});
+
+
+app.listen(process.env.PORT || 3000);
