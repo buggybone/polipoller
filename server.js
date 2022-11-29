@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const app = express();
 const router = express.Router();
@@ -7,14 +8,16 @@ const { Client } = require('pg');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const crypto = require('crypto');
+const { emitWarning } = require('process');
 const client2 = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const MY_NUMBER = '+14302491085';
 
 //Include all files in the public folder.
-app.use(express.static(path.join(__dirname, ''))); //CHANGE THIS LATER FOR SECURITY PURPOSES
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use("/", router);
+app.use(express.static(path.join(__dirname, '/public'))); 
 
 //global variables
 
@@ -36,36 +39,49 @@ function loadIt(filename) {
   return $;
 };
 
-/*
-function checkLogin(email, pw, res) {
-  var insert = [];
-  insert.push(email);
-  client.query('SELECT pwhash, salt FROM users WHERE email=$1;',insert , (err, resp) => {
-    if (err){
-      var result = 'in the bad branch';
-      res.send(result);
-    } else {
-      var result = crypto.createHash('md5').update(resp.rows[0].salt + pw).digest('hex');
-      res.send(result == resp.rows[0].pwhash);
-    }
-  });
-}*/
+function genSessionId() {
+  var sessID = crypto.createHash('md5').update(Math.random().toString()).digest('hex').slice(0,10);
+  return sessID;
+}
 
 app.get('/', (req, res) => {
+  var sid = req.cookies['sessionID'];
+  if(sid){
+    client.query('SELECT * FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
+      if(res1.rows.length == 0){
+        res.sendFile(path.join(__dirname+'/index.html'));
+      } else {
+        var uid = res1.rows[0].user_id;
+        client.query('SELECT * FROM users WHERE user_id=$1;', [uid], (err2, res2) => {
+          var $ = loadIt('/dashboard.html');
+          $('#userfn').html(res2.rows[0].fname);
+          client.query('SELECT poll_name, poll_id FROM polls WHERE owner=$1;', [uid], (err3, res3) => {
+            var insertString = '<option value="0">Select a Poll to View</option>';
+            for(var i = 0; i < res3.rows.length; i++){
+              insertString += '<option value="' + res3.rows[i].poll_id + '">' + res3.rows[i].poll_name + '</option>';
+            }
+            $('#poll-list').html(insertString);
+            res.send($.html());
+          });
+        });
+      }
+    });
+  } else {
     res.sendFile(path.join(__dirname+'/index.html'));
+  }
 });
 
 app.post('/signup', (req, res) => {
   client.query('SELECT user_id FROM users WHERE email=$1;', [req.body.email], (err1, res1) => {
     if(res1.rows.length != 0){
       var errstring = 'User already exists.';
-      var $ = loadIt('/signup.html');
+      var $ = loadIt('/public/signup.html');
       $('div.errorspace').html(errstring);
       responseString = $.html();
       res.send(responseString);
     }else if(req.body.pw != req.body.pw2){
       var errstring = 'Passwords do not match.';
-      var $ = loadIt('/signup.html');
+      var $ = loadIt('/public/signup.html');
       $('div.errorspace').html(errstring);
       responseString = $.html();
       res.send(responseString);
@@ -81,19 +97,41 @@ app.post('/signup', (req, res) => {
 });
 
 app.post('/signin', (req, res) => {
-  client.query('SELECT email, salt, pwhash FROM users WHERE email=$1;', [req.body.email], (err1, res1) => {
+  client.query('SELECT * FROM users WHERE email=$1;', [req.body.email], (err1, res1) => {
     var something_wrong = (res1.rows.length == 0)||(crypto.createHash('md5').update(res1.rows[0].salt+req.body.pw).digest('hex') != res1.rows[0].pwhash);
     if(something_wrong){
       var errstring = 'There was a problem with your login credentials.';
-      var $ = loadIt('/signin.html');
+      var $ = loadIt('/public/signin.html');
       $('div.errorspace').html(errstring);
       responseString = $.html();
       res.send(responseString);
     }else{
-      res.sendFile(path.join(__dirname+'/dashboard.html'));
+      var sid = genSessionId();
+      var uid = res1.rows[0].user_id;
+      client.query('INSERT INTO sessions VALUES ($1, $2);', [sid, uid], (err2, res2) => {});
+      var $ = loadIt('/dashboard.html');
+      res.cookie('sessionID', sid);
+      //$('#cookiespace').html('document.cookie = "sessionID=' + sid + '";');
+      $('#userfn').html(res1.rows[0].fname);
+      client.query('SELECT poll_name, poll_id FROM polls WHERE owner=$1;', [uid], (err3, res3) => {
+        var insertString = '<option value="0">Select a Poll to View</option>';
+        for(var i = 0; i < res3.rows.length; i++){
+          insertString += '<option value="' + res3.rows[i].poll_id + '">' + res3.rows[i].poll_name + '</option>';
+        }
+        $('#poll-list').html(insertString);
+        res.send($.html());
+      });
     }
   });
 });
+
+app.post('/logout', (req, res) => {
+  var sid = req.cookies['sessionID'];
+  client.query('DELETE FROM sessions WHERE session_key=$1;', [sid], (err1, res1) => {});
+  var $ = loadIt('/index.html');
+  $('#message').html('You have been logged out successfully!');
+  res.send($.html());
+})
 
 app.get('/twiliotest', (req, res) => {
   client2.messages
@@ -119,8 +157,8 @@ app.post('/pollresponse', (req, res) => {
   });
 });
 
-app.get('/pollresultspage', (req, res) => {
-  client.query('SELECT * FROM responses WHERE poll_id=1', (req1, res1) => {
+app.post('/pollresultspage', (req, res) => {
+  client.query('SELECT * FROM responses WHERE poll_id=$1', [req.body.polls], (err1, res1) => {
     var total = [0,0,0];
     var gendata = [[0,0,0],[0,0,0],[0,0,0]];
     var pardata = [[0,0,0],[0,0,0],[0,0,0]];
