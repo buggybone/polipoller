@@ -151,6 +151,20 @@ app.get('/pollpage', (req, res) => {
   });
 });
 
+app.get('/createpoll', (req, res) => {
+  res.sendFile(path.join(__dirname+'/createpoll.html'));
+});
+
+app.post('/createpoll', (req, res) => {
+  var sid = req.cookies['sessionID'];
+  client.query('SELECT user_id FROM sessions WHERE session_key=$1', [sid], (err1, res1) =>{
+    var uid = res1.rows[0].user_id;
+    client.query('INSERT INTO polls(owner, poll_name, question) VALUES ($1, $2, $3)', [uid, req.body.poll_name, req.body.question], (err2, res2) => {
+      res.redirect('/');
+    });
+  });
+});
+
 app.post('/pollresponse', (req, res) => {
   client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [1,  Math.floor(Math.random() * 10000), req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party], (err1, res1) => {
     res.send('Thank you for your response!');
