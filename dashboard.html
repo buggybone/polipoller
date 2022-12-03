@@ -5,14 +5,23 @@
 </head>
 <body>
     <h1>Welcome to your dashboard, <span id="userfn"></span>!</h1>
+
     <form action="/createpoll" method="GET">
         <button type ="submit">Create a New Poll</button>
     </form>
+    
     <form action="/pollresultspage" method="POST">
         <label for="polls">View a Past Poll's Results</label>
-        <select name="polls" id="poll-list"></select>
+        <select name="polls" class="poll-list"></select>
         <input type="submit" value="View" />
     </form>
+    
+    <form action="/pollsendpage" method="POST">
+        <label for="polls">Choose a Poll to Send</label>
+        <select name="polls" class="poll-list"></select>
+        <input type="submit" value="Send" />
+    </form>
+
     <form action="/logout" method="POST">
         <input type="submit" value="Logout"/>
     </form>
