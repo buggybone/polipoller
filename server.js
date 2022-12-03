@@ -146,7 +146,7 @@ app.get('/twiliotest', (req, res) => {
 app.get('/pollpage', (req, res) => {
   var pid = req.query.pid;
   var rid = req.query.rid;
-  client.query('SELECT question FROM polls WHERE poll_id=1', (req1, res1) => {
+  client.query('SELECT question FROM polls WHERE poll_id=$1', [pid], (req1, res1) => {
     var q = res1.rows[0].question;
     var $ = loadIt('/pollpage.html');
     $('#question').html(q);
