@@ -44,6 +44,7 @@ function genSessionId() {
   return sessID;
 }
 
+//GET and POST handling
 app.get('/', (req, res) => {
   var sid = req.cookies['sessionID'];
   if(sid){
@@ -136,17 +137,23 @@ app.post('/logout', (req, res) => {
 app.get('/twiliotest', (req, res) => {
   client2.messages
   .create({
-     body: 'It works!',
+     body: 'Try this link: http://www.wikipedia.org',
      from: MY_NUMBER,
      to: '+14257607569'
    });
 });
 
 app.get('/pollpage', (req, res) => {
+  var pid = req.query.pid;
+  var rid = req.query.rid;
   client.query('SELECT question FROM polls WHERE poll_id=1', (req1, res1) => {
     var q = res1.rows[0].question;
     var $ = loadIt('/pollpage.html');
     $('#question').html(q);
+    var hidden = '<input type="hidden" name="pid" value="' + pid + '">'
+    var hidden2 = '<input type="hidden" name="rid" value="' + rid + '">'
+    $('#pid').html(hidden);
+    $('#rid').html(hidden2);
     res.send($.html());
   });
 });
@@ -166,7 +173,7 @@ app.post('/createpoll', (req, res) => {
 });
 
 app.post('/pollresponse', (req, res) => {
-  client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [1,  Math.floor(Math.random() * 10000), req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party], (err1, res1) => {
+  client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [req.body.pid, req.body.rid, req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party], (err1, res1) => {
     res.send('Thank you for your response!');
   });
 });
@@ -284,10 +291,32 @@ app.post('/pollsendpage', (req, res) => {
             question + '" Thank you for your help! ';
           var $ = loadIt('/sendpoll.html');
           $('#messagespace').html(message);
+          var hidden = '<input type="hidden" name="message" value="' + message + '">'
+          $('#messagespace2').html(hidden);
+          var hidden2 = '<input type="hidden" name="pollid" value="' + poll_id + '">'
           res.send($.html());
       });
     });
   });
+});
+
+app.post('/sendpoll2', (req, res) => {
+  res.sendFile(path.join(__dirname, '/sendpoll2.html'));
+  var pid = req.body.poll_id;
+  var message = req.body.message;
+  var scale = req.body.scale;
+  var ac = req.body.ac;
+
+  var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
+
+  for(var i = 1; i < 6; i++){
+    var fullermessage = fullmessage + String(i);
+    client2.messages.create({
+      body: fullermessage,
+      from: MY_NUMBER,
+      to: '+14257607569'
+    });
+  }
 });
 
 app.listen(process.env.PORT || 3000);
