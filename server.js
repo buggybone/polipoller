@@ -302,14 +302,14 @@ app.post('/pollsendpage', (req, res) => {
 
 app.post('/sendpoll2', (req, res) => {
   res.sendFile(path.join(__dirname, '/sendpoll2.html'));
-  var pid = req.body.poll_id;
+  var pid = req.body.pollid;
   var message = req.body.message;
   var scale = req.body.scale;
   var ac = req.body.ac;
 
   var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
 
-  for(var i = 1; i < 6; i++){
+  for(var i = 1; i < 2; i++){
     var fullermessage = fullmessage + String(i);
     client2.messages.create({
       body: fullermessage,
