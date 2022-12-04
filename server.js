@@ -47,8 +47,7 @@ function genSessionId() {
 //GET and POST handling
 app.get('/', (req, res) => {
   var sid = req.cookies['sessionID'];
-  res.send(sid);
-  /*if(sid){
+  if(sid){
     client.query('SELECT * FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
       if(res1.rows.length == 0){
         res.sendFile(path.join(__dirname+'/index.html'));
@@ -69,8 +68,9 @@ app.get('/', (req, res) => {
       }
     });
   } else {
-    res.sendFile(path.join(__dirname+'/index.html'));
-  }*/
+    res.send("I don't know your sid");
+    //res.sendFile(path.join(__dirname+'/index.html'));
+  }
 });
 
 app.post('/signup', (req, res) => {
