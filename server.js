@@ -68,8 +68,7 @@ app.get('/', (req, res) => {
       }
     });
   } else {
-    res.send("I don't know your sid");
-    //res.sendFile(path.join(__dirname+'/index.html'));
+    res.sendFile(path.join(__dirname+'/index.html'));
   }
 });
 
@@ -108,7 +107,7 @@ app.post('/signin', (req, res) => {
       responseString = $.html();
       res.send(responseString);
     }else{
-      var sid = genSessionId();
+      var sid = crypto.createHash('md5').update(Math.random().toString()).digest('hex').slice(0,10);
       var uid = res1.rows[0].user_id;
       client.query('INSERT INTO sessions VALUES ($1, $2);', [sid, uid], (err2, res2) => {});
       var $ = loadIt('/dashboard.html');
