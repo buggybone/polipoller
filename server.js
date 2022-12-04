@@ -277,7 +277,7 @@ app.post('/pollresultspage', (req, res) => {
 
 app.post('/pollsendpage', (req, res) => {
   var sid = req.cookies['sessionID'];
-  var poll_id = req.body.polls;
+  var poll_id = req.body.polltosend;
   client.query('SELECT user_id FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
     var uid = res1.rows[0].user_id;
     client.query('SELECT * FROM polls WHERE poll_id=$1', [poll_id], (err2, res2)=> {
