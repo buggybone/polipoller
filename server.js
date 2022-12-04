@@ -294,7 +294,7 @@ app.post('/pollsendpage', (req, res) => {
           var hidden = '<input type="hidden" name="message" value="' + message + '">';
           $('#messagespace2').html(hidden);
           var hidden2 = '<input type="hidden" name="pollid" value="' + poll_id + '">';
-          $('#pollidspace').html(hidden);
+          $('#pollidspace').html(hidden2);
           res.send($.html());
       });
     });
