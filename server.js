@@ -112,14 +112,13 @@ app.post('/signin', (req, res) => {
       client.query('INSERT INTO sessions VALUES ($1, $2);', [sid, uid], (err2, res2) => {});
       var $ = loadIt('/dashboard.html');
       res.cookie('sessionID', sid);
-      //$('#cookiespace').html('document.cookie = "sessionID=' + sid + '";');
       $('#userfn').html(res1.rows[0].fname);
       client.query('SELECT poll_name, poll_id FROM polls WHERE owner=$1;', [uid], (err3, res3) => {
         var insertString = '<option value="0">Select a Poll to View</option>';
         for(var i = 0; i < res3.rows.length; i++){
           insertString += '<option value="' + res3.rows[i].poll_id + '">' + res3.rows[i].poll_name + '</option>';
         }
-        $('#poll-list').html(insertString);
+        $('.poll-list').html(insertString);
         res.send($.html());
       });
     }
@@ -310,7 +309,7 @@ app.post('/sendpoll2', (req, res) => {
 
   var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
 
-  for(var i = 1; i < 2; i++){
+  for(var i = 1; i < 4; i++){
     var fullermessage = fullmessage + String(i);
     client2.messages.create({
       body: fullermessage,
