@@ -291,9 +291,10 @@ app.post('/pollsendpage', (req, res) => {
             question + '" Thank you for your help! ';
           var $ = loadIt('/sendpoll.html');
           $('#messagespace').html(message);
-          var hidden = '<input type="hidden" name="message" value="' + message + '">'
+          var hidden = '<input type="hidden" name="message" value="' + message + '">';
           $('#messagespace2').html(hidden);
-          var hidden2 = '<input type="hidden" name="pollid" value="' + poll_id + '">'
+          var hidden2 = '<input type="hidden" name="pollid" value="' + poll_id + '">';
+          $('#pollidspace').html(hidden);
           res.send($.html());
       });
     });
