@@ -37,10 +37,7 @@ CREATE TABLE sessions (
 
 
 
-dashboard should...
-display info about user
-poll create
-view poll status
+
 
 WHAT IS YOUR GENDER? Male, Female, Non-Binary, Prefer Not To Say
 What IS YOUR POLITICAL PARTY AFFILIATION? Democratic, Republican, Other, Prefer not to say
