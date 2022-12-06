@@ -7,17 +7,31 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function grapher(iden, labs, ds){
-            console.log(labs);
-            console.log(ds);
             var x = [];
+
+            var opt = {responsive: true}
+            opt['scales'] = {x: {ticks: {font: {size: 24}}} ,y: {ticks: {font: {size: 20}}, title: {display: true, font: {size: 24}, text: "Percentage"}}}
+
+            if(ds.length==1){
+                opt['plugins'] = {legend: {display: false}}
+            }
+
             for(var i = 0; i < ds.length; i++){
+                var l = "";
+                if(i == 0){
+                    l = "Yes"
+                } else if(i == 1){
+                    l = "No"
+                }
+
                 var y = {
+                    label: l,
                     data: ds[i],
-                    borderWidth: 1
+                    borderWidth: 5,
+                    borderRadius: Number.MAX_VALUE
                 }
                 x.push(y);
             }
-            console.log(x);
             var mydata = {
                     labels: labs,
                     datasets: x
@@ -25,30 +39,31 @@
             var ctx = document.getElementById(iden);
             new Chart(ctx, {
                 type: 'bar',
-                data: mydata
+                data: mydata,
+                options: opt
             });
         }
     </script>
 </head>
 <body>
-    <h1>Poll Results</h1>
+    <div class="header">
+        <img src="pollipoller_logo.png">
+    </div>
+    <h1>Here are your PoliPoll results!</h1>
+
     <form action="/" method="GET">
-        <button type ="submit">Back to Home</button>
+        <button type ="submit">Back to Dashboard</button>
     </form>
-    Polls Sent:
-    Responses Received:
-    Response Rate:
-    <h2>Overall Results:</h2>
-    <canvas id="totals"></canvas>
-    <h2>Results by Gender:</h2>
-    <canvas id="gender"></canvas>
-    <h2>Results by Age:</h2>
-    <canvas id="age"></canvas>
-    <h2> Results by Ethnicity:</h2>
-    <canvas id="ethnicity"></canvas>
-    <h2>Results by Party Affiliation:</h2>
-    <canvas id="party"></canvas>
+
+    <div class="chart-wrapper"><h2>Total Number of Responses:<span id="tot"></span></h2></div>
+    <div class="chart-wrapper"><h2>Overall Results:</h2><canvas class="result" id="totals"></canvas></div>
+    <div class="chart-wrapper"><h2>Results by Gender:</h2><canvas class="result" id="gender"></canvas></div>
+    <div class="chart-wrapper"><h2>Results by Age:</h2><canvas class="result" id="age"></canvas></div>
+    <div class="chart-wrapper"><h2> Results by Ethnicity:</h2><canvas class="result" id="ethnicity"></canvas></div>
+    <div class="chart-wrapper"><h2>Results by Party Affiliation:</h2><canvas class="result" id="party"></canvas></div>
     
+    <div class="footer">&copy; Ryan Pettibone 2022</div>
     <script id="insert"></script>
+    
 </body>
 </html>

@@ -19,9 +19,6 @@ app.use(cookieParser());
 app.use("/", router);
 app.use(express.static(path.join(__dirname, '/public'))); 
 
-//global variables
-
-
 //Initialize db connection.
 const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -55,9 +52,9 @@ app.get('/', (req, res) => {
         var uid = res1.rows[0].user_id;
         client.query('SELECT * FROM users WHERE user_id=$1;', [uid], (err2, res2) => {
           var $ = loadIt('/dashboard.html');
-          $('#userfn').html(res2.rows[0].fname);
+          $('#userfn').html(res2.rows[0].fname + '!');
           client.query('SELECT poll_name, poll_id FROM polls WHERE owner=$1;', [uid], (err3, res3) => {
-            var insertString = '<option value="0">Select a Poll to View</option>';
+            var insertString = '<option value="0">Select a Poll</option>';
             for(var i = 0; i < res3.rows.length; i++){
               insertString += '<option value="' + res3.rows[i].poll_id + '">' + res3.rows[i].poll_name + '</option>';
             }
@@ -109,6 +106,7 @@ app.post('/signin', (req, res) => {
     }else{
       var sid = crypto.createHash('md5').update(Math.random().toString()).digest('hex').slice(0,10);
       var uid = res1.rows[0].user_id;
+      client.query('DELETE FROM sessions WHERE user_id=$1;', [uid], (err2, res2) => {});
       client.query('INSERT INTO sessions VALUES ($1, $2);', [sid, uid], (err2, res2) => {});
       var $ = loadIt('/dashboard.html');
       res.cookie('sessionID', sid);
@@ -127,20 +125,12 @@ app.post('/signin', (req, res) => {
 
 app.post('/logout', (req, res) => {
   var sid = req.cookies['sessionID'];
+  res.cookie('sessionID','');
   client.query('DELETE FROM sessions WHERE session_key=$1;', [sid], (err1, res1) => {});
   var $ = loadIt('/index.html');
   $('#message').html('You have been logged out successfully!');
   res.send($.html());
 })
-
-app.get('/twiliotest', (req, res) => {
-  client2.messages
-  .create({
-     body: 'Try this link: http://www.wikipedia.org',
-     from: MY_NUMBER,
-     to: '+14257607569'
-   });
-});
 
 app.get('/pollpage', (req, res) => {
   var pid = req.query.pid;
@@ -179,7 +169,7 @@ app.post('/pollresponse', (req, res) => {
 
 app.post('/pollresultspage', (req, res) => {
   client.query('SELECT * FROM responses WHERE poll_id=$1', [req.body.polls], (err1, res1) => {
-    var total = [0,0,0];
+    var total = [0,0,0,0];
     var gendata = [[0,0,0],[0,0,0],[0,0,0]];
     var pardata = [[0,0,0],[0,0,0],[0,0,0]];
     var agedata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
@@ -188,9 +178,17 @@ app.post('/pollresultspage', (req, res) => {
     for(var i = 0; i < res1.rows.length; i++){
       var row = res1.rows[i];
       var ans = parseInt(row.resp);
+
+      if(ans != -1){
+        total[3]++;
+        if(ans == 6){
+          total[2]++;
+        } else {
+          total[ans]++;
+        }
+      }
+
       if(ans != -1 && ans != 6){
-        total[2]++;
-        total[ans]++;
 
         var gencode = parseInt(row.gender);
         if(gencode != -1 && gencode != 6){
@@ -218,11 +216,15 @@ app.post('/pollresultspage', (req, res) => {
       }
     }
 
-    var totresults = [0,0];
-    if(total[2] != 0){
-      totresults[0] = total[0]/total[2]*100;
-      totresults[1] = total[1]/total[2]*100;
+    var totresults = [[0, 0, 0]];
+    var totlabels = JSON.stringify(['Yes', 'No', 'Chose not to Respond']);
+    if(total[3] != 0){
+      totresults[0][0] = total[0]/total[3]*100;
+      totresults[0][1] = total[1]/total[3]*100;
+      totresults[0][2] = total[2]/total[3]*100;
     }
+    totresults = JSON.stringify(totresults);
+
     var genresults = [[0,0,0],[0,0,0]];
     for(var i = 0; i < gendata.length; i++){
       if(gendata[i][2] != 0){
@@ -257,18 +259,21 @@ app.post('/pollresultspage', (req, res) => {
     for(var i = 0; i < ethdata.length; i++){
       if(ethdata[i][2] != 0){
         ethresults[0][i] = ethdata[i][0]/ethdata[i][2]*100;
-        ethresults[0][i] = ethdata[i][1]/ethdata[i][2]*100;
+        ethresults[1][i] = ethdata[i][1]/ethdata[i][2]*100;
       }
     }
     ethresults = JSON.stringify(ethresults);
     var ethlabels = JSON.stringify(['Asian/Pacific Islander', 'Black or African American', 'Hispanic or Latino', 'Native American or American Indian', 'White', 'Other']);
     
+    var noResponses = total[3];
     var $ = loadIt('/pollresultspage.html');
-    $('#insert').html('grapher("gender",'+ genlabels +  ',' + genresults + ');' +
+    $('#insert').html('grapher("totals",'+ totlabels +  ',' + totresults + ');' +
+                      'grapher("gender",'+ genlabels +  ',' + genresults + ');' +
                       'grapher("age",'+ agelabels +  ',' + ageresults + ');' +
-                      'grapher("party",'+ parlabels +  ',' + parresults + ');' +
-                      'grapher("ethnicity",'+ ethlabels +  ',' + ethresults + ');' 
+                      'grapher("ethnicity",'+ ethlabels +  ',' + ethresults + ');' +
+                      'grapher("party",'+ parlabels +  ',' + parresults + ');'
                 );
+    $('#tot').html(noResponses);
     res.send($.html());
 
   });

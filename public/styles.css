@@ -43,8 +43,32 @@ button {
     margin-right: -20px;
 }
 
-.footer {
+img {
     background-color: white;
+}
+
+.result {
+    background-color: white;
+}
+
+.chart-wrapper {
+    width: 85%;
+    height: auto;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    border-color: darkblue;
+    background-color: white;
+    border-radius: 20px;
+    border-width: 5px;
+}
+
+.chart-wrapper > h2, #tot {
+    background-color: white;
+}
+
+.footer {
     padding: 20px;
     margin-left: -20px;
     margin-right: -20px;
@@ -52,6 +76,6 @@ button {
     margin-bottom: -20px;
 }
 
-img {
-    background-color: white;
+h1{
+    font-size: 48px;
 }
