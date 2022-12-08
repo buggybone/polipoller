@@ -1,0 +1,108 @@
+* {
+    background-color: pink;
+    font-size: 32px;
+    padding: 10px;
+    text-align: center;
+    color: darkblue;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    border-radius: 20px;
+    border-color: darkblue;
+    border-width: 8px;
+    background-color: lightcoral;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    box-shadow: none;
+
+}
+
+#message {
+    height: 100px;;
+}
+
+.header {
+    background-color: white;
+    border: 0;
+    margin-top: -20px;
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+img {
+    background-color: white;
+}
+
+.result {
+    background-color: white;
+}
+
+.chart-wrapper {
+    width: 85%;
+    height: auto;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    border-color: darkblue;
+    background-color: white;
+    border-radius: 20px;
+    border-width: 5px;
+}
+
+.chart-wrapper > h2, #tot {
+    background-color: white;
+}
+
+.footer {
+    padding: 20px;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-top: auto;
+    margin-bottom: -20px;
+    background-color: white;
+}
+
+h1, #userfn{
+    font-size: 48px;
+}
+
+.my_input, select {
+    background-color: white;
+}
+
+input[type=submit] {
+    border-radius: 20px;
+    border-color: darkblue;
+    border-width: 8px;
+    background-color: lightcoral;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    box-shadow: none;
+}
+
+label {
+    padding: 5px;
+}
+
+input[type='radio'] { 
+    transform: scale(2); 
+}
