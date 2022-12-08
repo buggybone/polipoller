@@ -4,12 +4,15 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body>
+    <div class="header">
+        <img src="pollipoller_logo.png">
+    </div>
     <h1>Send Your PoliPoll!</h1>
     <div id="errorspace"></div>
     <p>The SMS message that will be sent will read as follows:</p>
-    <p><span id="messagespace"></span><br><em>--Link to your poll--</em></p>
+    <div id="messagespace"></div>
+
     <form action="/sendpoll2" method="POST">
-        <fieldset>
           <div id="messagespace2"></div>
           <div id="pollidspace"></div>
           <label>Select Poll Scale:</label>
@@ -33,10 +36,10 @@
           <p>WARNING: Clicking the button below will send the poll at the scale you selected to random numbers in the area code you entered.</p>
           <button type ="submit">Send Poll</button>
           <br><br><br>
-        </fieldset>
     </form>
     <form action="/" method="GET">
         <button type ="submit">Back to Dashboard</button>
     </form>
+    <div class="footer">&copy; Ryan Pettibone 2022</div>
 </body>
 </html>

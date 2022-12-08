@@ -4,24 +4,26 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body>
+    <div class="header">
+        <img src="pollipoller_logo.png">
+    </div>
     <h1>Create your PoliPoll here!</h1>
     <form action="/createpoll" method="POST">
-        <fieldset>
           <label>Poll Name:</label>
-          <br>
+          <br><br>
           <input type="text" class="my_input" name="poll_name" required>
+          <br><br><br>
+          <label>Type a Yes or No Poll Question Below:</label>
           <br><br>
-          <label>Poll Question:</label>
-          <br>
           <input type="textarea" class="my_input" name="question" required>
-          <br><br>
+          <br><br><br>
           <button type ="reset">Reset</button>
           <button type ="submit">Create</button>
           <br><br><br>
-        </fieldset>
     </form>
     <form action="/" method="GET">
         <button type ="submit">Back to Dashboard</button>
     </form>
+    <div class="footer">&copy; Ryan Pettibone 2022</div>
 </body>
 </html>

@@ -74,8 +74,35 @@ img {
     margin-right: -20px;
     margin-top: auto;
     margin-bottom: -20px;
+    background-color: white;
 }
 
-h1{
+h1, #userfn{
     font-size: 48px;
+}
+
+.my_input, select {
+    background-color: white;
+}
+
+input[type=submit] {
+    border-radius: 20px;
+    border-color: darkblue;
+    border-width: 8px;
+    background-color: lightcoral;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    box-shadow: none;
+}
+
+label {
+    padding: 5px;
+}
+
+input[type='radio'] { 
+    transform: scale(2); 
 }

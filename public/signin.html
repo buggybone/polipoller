@@ -5,26 +5,27 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body>
-    <h1> Sign In</h1>
+    <div class="header">
+        <img src="pollipoller_logo.png">
+    </div>
     <div class="errorspace"></div>
     <form action="/signin" method="POST">
-        <fieldset>
-          <h3>Log In to Your PoliPoller Account Here:</h3>
+          <h3>Sign In to Your PoliPoller Account Here:</h3>
           <label>Email Address:</label>
-          <br>
+          <br><br>
           <input type="text" class="my_input" name="email" required>
-          <br><br>
+          <br><br><br>
           <label>Password:</label>
-          <br>
-          <input type="password" class="my_input" name="pw" required>
           <br><br>
+          <input type="password" class="my_input" name="pw" required>
+          <br><br><br>
           <button type ="reset">Reset</button>
           <button type ="submit">Submit</button>
-          <br><br><br>
-        </fieldset>
+          <br>
     </form>
     <form action="/" method="GET">
         <button type ="submit">Back to Home</button>
     </form>
+    <div class="footer">&copy; Ryan Pettibone 2022</div>
 </body>
 </html>
