@@ -3,11 +3,13 @@
     <title>Welcome to PoliPoller!</title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="styles.css" />
+
 </head>
 <body>
     <div class="header">
         <img src="pollipoller_logo.png">
     </div>
+    <div id="mobilespace">Dude</div>
     <div id="message"></div>
     <button onclick="window.location.href='/signin.html';">
         Sign In
@@ -17,5 +19,9 @@
         Sign Up
     </button>
     <div class="footer">&copy; Ryan Pettibone 2022</div>
+    <script>
+        var isMobile = navigator.userAgentData.mobile;
+        document.getElementById('mobilespace').innerHTML = isMobile;
+    </script>
 </body>
 </html>
