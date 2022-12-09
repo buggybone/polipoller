@@ -1,6 +1,6 @@
 * {
-    background-color: pink;
-    font-size: 32px;
+    background-color: lightskyblue;
+    font-size: 48px;
     padding: 10px;
     text-align: center;
     color: darkblue;
@@ -17,18 +17,17 @@ body {
 button {
     border-radius: 20px;
     border-color: darkblue;
-    border-width: 8px;
+    border-width: 20px;
     background-color: lightcoral;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 80px;
+    padding-bottom: 80px;
     padding-left: 50px;
     padding-right: 50px;
-    margin-left: 30%;
-    margin-right: 30%;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     box-shadow: none;
-
 }
 
 #message {
@@ -45,6 +44,11 @@ button {
 
 img {
     background-color: white;
+    width: 100%;
+    height: auto;
+    margin-top: -20px;
+    margin-left:-20px;
+    margin-right: -20px;
 }
 
 .result {
@@ -70,6 +74,7 @@ img {
 
 .footer {
     padding: 20px;
+    padding-bottom: 40px;
     margin-left: -20px;
     margin-right: -20px;
     margin-top: auto;
@@ -90,13 +95,15 @@ input[type=submit] {
     border-color: darkblue;
     border-width: 8px;
     background-color: lightcoral;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 60px;
+    padding-bottom: 60px;
     padding-left: 50px;
     padding-right: 50px;
     margin-top: 40px;
     margin-bottom: 40px;
     box-shadow: none;
+    display: block;
+    width: 100%;
 }
 
 label {
@@ -104,5 +111,34 @@ label {
 }
 
 input[type='radio'] { 
-    transform: scale(2); 
+    transform: scale(5); 
+    margin: 50px;
+}
+
+input[type='text'], input[type='password'], input[type='textarea'] { 
+    height: 120px;
+    width: 90%;
+}
+
+button[type='reset'], button[type='submit'] {
+    margin-left: -20px;
+    margin-right: -20px;
+    width: 100%;
+    border-width: 20px;
+}
+
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+input[type='reset'], input[type='submit'] {
+    width: 100%;
+    border-width: 20px;
+}
+
+select {
+    height: 150px;
+    display: block;
+    width: 100%;
 }
