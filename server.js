@@ -162,7 +162,7 @@ app.post('/createpoll', (req, res) => {
 });
 
 app.post('/pollresponse', (req, res) => {
-  client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [req.body.pid, req.body.rid, req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party], (err1, res1) => {
+  client.query('UPDATE responses SET resp=$1, gender=$2, age=$3, ethnicity=$4, party=$5 WHERE poll_id=$6 AND resp_id=$7;', [req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party, req.body.pid, req.body.rid], (err1, res1) => {
     res.send('Thank you for your response!');
   });
 });
@@ -301,8 +301,7 @@ app.post('/pollsendpage', (req, res) => {
             question + '" Thank you for your help! ';
           var $ = loadIt('/sendpoll.html');
           $('#messagespace').html('<p>' + message + '<br>--Link to Your Poll--</p>');
-          var hidden = '<input type="hidden" name="message" value="' + message + '">';
-          $('#messagespace2').html(hidden);
+          $('input[name="message"]').val(message);
           var hidden2 = '<input type="hidden" name="pollid" value="' + poll_id + '">';
           $('#pollidspace').html(hidden2);
           res.send($.html());
@@ -316,19 +315,30 @@ app.post('/sendpoll2', (req, res) => {
   res.sendFile(path.join(__dirname, '/sendpoll2.html'));
   var pid = req.body.pollid;
   var message = req.body.message;
-  var scale = req.body.scale;
+  //var scale = req.body.scale;
+  var scale = 2;
+  
   var ac = req.body.ac;
 
-  var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
+  client.query('SELECT MAX(resp_id) FROM responses WHERE poll_id=$1;', [pid], (req1, res1) => {
+    let min;
+    if(res1.rows[0].max){
+      min = parseInt(res1.rows[0].max) + 1;
+    }else{
+      min = 0;
+    }
 
-  for(var i = 1; i < 4; i++){
-    var fullermessage = fullmessage + String(i);
-    client2.messages.create({
-      body: fullermessage,
-      from: MY_NUMBER,
-      to: '+14257607569'
-    });
-  }
+    var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
+    for(var i = min; i < min + scale; i++){
+      client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, i, -1, -1, -1, -1, -1], (req2, res2) => {});
+      var fullermessage = fullmessage + String(i);
+      client2.messages.create({
+        body: fullermessage,
+        from: MY_NUMBER,
+        to: '+14257607569'
+      });
+    }
+  });
 });
 
 app.listen(process.env.PORT || 3000);
