@@ -163,7 +163,7 @@ app.post('/createpoll', (req, res) => {
 
 app.post('/pollresponse', (req, res) => {
   client.query('UPDATE responses SET resp=$1, gender=$2, age=$3, ethnicity=$4, party=$5 WHERE poll_id=$6 AND resp_id=$7;', [req.body.question, req.body.gender, req.body.age, req.body.ethnicity, req.body.party, req.body.pid, req.body.rid], (err1, res1) => {
-    res.send('Thank you for your response!');
+    res.sendFile(path.join(__dirname+'/thankyou.html'));
   });
 });
 
