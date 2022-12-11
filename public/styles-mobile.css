@@ -143,7 +143,7 @@ select {
     width: 100%;
 }
 
-#footer-text {
+.footer-text {
     background-color: white;
     margin-bottom: 10px;
 }
