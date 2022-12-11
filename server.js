@@ -95,7 +95,7 @@ app.post('/signup', (req, res) => {
       var pwhash = crypto.createHash('md5').update(salt+req.body.pw).digest('hex');
       client.query('INSERT INTO users(email, salt, pwhash, fname, lname, office) VALUES ($1, $2, $3, $4, $5, $6);', [req.body.email, salt, pwhash, req.body.fname, req.body.lname, req.body.office], (err2, res2) => {
         var $ = loadIt('/index.html');
-        $('.message').html('Account created successfully! Please sign in to continue.');
+        $('#message').html('Account created successfully! Please sign in to continue.');
         res.send($.html());
       });
     }
