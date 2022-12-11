@@ -11,6 +11,7 @@
                 "fs": "^0.0.1-security",
                 "path": "^0.12.7",
                 "pg": "latest",
-                "twilio": "^3.83.3"
+                "twilio": "^3.83.3",
+                "validator": "^13.7.0"
         }
 }

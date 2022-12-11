@@ -10,6 +10,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { emitWarning } = require('process');
 const client2 = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const validator = require('validator');
 const MY_NUMBER = '+14302491085';
 
 //Include all files in the public folder.
@@ -79,6 +80,12 @@ app.post('/signup', (req, res) => {
       res.send(responseString);
     }else if(req.body.pw != req.body.pw2){
       var errstring = 'Passwords do not match.';
+      var $ = loadIt('/public/signup.html');
+      $('div.errorspace').html(errstring);
+      responseString = $.html();
+      res.send(responseString);
+    }else if(!validator.isEmail(req.body.email)){
+      var errstring = 'Not a valid email.';
       var $ = loadIt('/public/signup.html');
       $('div.errorspace').html(errstring);
       responseString = $.html();
