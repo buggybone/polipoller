@@ -142,3 +142,8 @@ select {
     display: block;
     width: 100%;
 }
+
+#footer-text {
+    background-color: white;
+    margin-bottom: 10px;
+}
