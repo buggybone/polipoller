@@ -35,9 +35,13 @@ CREATE TABLE sessions (
 	CONSTRAINT fk1 FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
-
-
-
+CREATE TABLE numbers (
+	user_id INT NOT NULL,
+	phone VARCHAR(11),
+	PRIMARY KEY(user_id, phone),
+	CONSTRAINT fk1 FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+	
 
 WHAT IS YOUR GENDER? Male, Female, Non-Binary, Prefer Not To Say
 What IS YOUR POLITICAL PARTY AFFILIATION? Democratic, Republican, Other, Prefer not to say

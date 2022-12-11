@@ -42,6 +42,10 @@ function genSessionId() {
   return sessID;
 };
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
 //GET and POST handling
 app.get('/', (req, res) => {
   var sid = req.cookies['sessionID'];
@@ -335,16 +339,27 @@ app.post('/sendpoll2', (req, res) => {
     }else{
       min = 0;
     }
-
+    
+    for(var i = 0; i < 50; i++){
+      var resp = getRandomInt(3);
+      var gen = getRandomInt(3);
+      var age = getRandomInt(4);
+      var eth = getRandomInt(6);
+      var par = getRandomInt(3);
+      client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, i, resp, gen, age, eth, par], (req2, res2) => {});
+    }
+    
     var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
     for(var i = min; i < min + scale; i++){
+      
+      /*
       client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, i, -1, -1, -1, -1, -1], (req2, res2) => {});
       var fullermessage = fullmessage + String(i);
       client2.messages.create({
         body: fullermessage,
         from: MY_NUMBER,
         to: '+14257607569'
-      });
+      }); */
     }
   });
 });
