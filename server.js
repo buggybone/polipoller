@@ -12,13 +12,18 @@ const { emitWarning } = require('process');
 const client2 = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const validator = require('validator');
 const MY_NUMBER = '+14302491085';
+const fileUpload = require('express-fileupload');
+const { parse } = require('csv-parse');
+const csv=require('csvtojson');
 
 //Include all files in the public folder.
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(fileUpload());
 app.use("/", router);
 app.use(express.static(path.join(__dirname, '/public'))); 
+
 
 //Initialize db connection.
 const client = new Client({
@@ -348,7 +353,7 @@ app.post('/sendpoll2', (req, res) => {
       var par = getRandomInt(3);
       client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, i, resp, gen, age, eth, par], (req2, res2) => {});
     }
-    
+
     var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
     for(var i = min; i < min + scale; i++){
       
@@ -362,6 +367,46 @@ app.post('/sendpoll2', (req, res) => {
       }); */
     }
   });
+});
+
+app.get('/upload', (req, res) => {
+  res.sendFile(path.join(__dirname+'/upload.html'));
+});
+
+app.post('/upload', (req, res) => {
+ /* if (!req.files) {
+    return res.status(400).send("No files were uploaded.");
+  }*/
+
+  var y = req.files.csv.data.toString().split('\n');
+  var pattern = '^[0-9]{10}$';
+  var toLoad = []
+  res.send('Success!');
+
+  var sid = req.cookies['sessionID'];
+  if(sid){
+    client.query('SELECT * FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
+      if(res1.rows.length == 0){
+        res.sendFile(path.join(__dirname+'/index.html'));
+      } else {
+        var uid = res1.rows[0].user_id;
+        for(var i = 0; i < y.length; i++){
+          if(y[i].match(pattern)){
+            toLoad.push('+1'+y[i].toString());
+          }
+        }
+        toLoad.map((element) => {
+          client.query('SELECT * FROM numbers WHERE user_id=$1 AND phone=$2;', [uid, element], (err3, res3) => {
+            if(res3.rows.length == 0){
+              client.query('INSERT INTO numbers VALUES ($1,$2);', [uid, element], (err4, res4)=>{});
+            }
+          });
+        });
+      }
+    });
+  } else {
+    res.sendFile(path.join(__dirname+'/index.html'));
+  }
 });
 
 app.listen(process.env.PORT || 3000);

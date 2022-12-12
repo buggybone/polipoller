@@ -90,7 +90,7 @@ h1, #userfn{
     background-color: white;
 }
 
-input[type=submit] {
+input[type=submit], input[type='file'] {
     border-radius: 20px;
     border-color: darkblue;
     border-width: 8px;
@@ -110,4 +110,9 @@ label {
 
 input[type='radio'] { 
     transform: scale(2); 
+}
+
+ol {
+    margin-left: 20%;
+    margin-right: 20%;
 }

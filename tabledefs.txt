@@ -37,7 +37,7 @@ CREATE TABLE sessions (
 
 CREATE TABLE numbers (
 	user_id INT NOT NULL,
-	phone VARCHAR(11),
+	phone VARCHAR(12),
 	PRIMARY KEY(user_id, phone),
 	CONSTRAINT fk1 FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
