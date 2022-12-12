@@ -6,4 +6,5 @@
 * The app will collect anonymous demographic data from those polled, as well as their poll response.
 * Simple averaging is all that is needed to display the results. Cheerio will be used to modify HTML documents before they are served.
 * Wireframe is located in the project_docs folder.
-* Report 1 is also located in the project_docs folder.
+* Reports 1, 2, and 3 are located in the project_docs folder.
+* This project meets all the requirements: It uses HTML5. It uses Javascript. Revision control can be seen through the many commit messages I made. Different stylesheets are used for mobile and desktop. (NOTE: They are pretty similar, mostly I made the text bigger and buttons bigger) Node.js is used. The app uses Twilio and Chart.js. The app is hosted on Heroku.

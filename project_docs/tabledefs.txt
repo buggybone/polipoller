@@ -30,13 +30,18 @@ CREATE TABLE responses (
 	
 
 CREATE TABLE sessions (
+	session_key VARCHAR(10) NOT NULL,
+	user_id INT PRIMARY KEY,
+	CONSTRAINT fk1 FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
 
-
-
-dashboard should...
-display info about user
-poll create
-view poll status
+CREATE TABLE numbers (
+	user_id INT NOT NULL,
+	phone VARCHAR(12),
+	PRIMARY KEY(user_id, phone),
+	CONSTRAINT fk1 FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+	
 
 WHAT IS YOUR GENDER? Male, Female, Non-Binary, Prefer Not To Say
 What IS YOUR POLITICAL PARTY AFFILIATION? Democratic, Republican, Other, Prefer not to say
