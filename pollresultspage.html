@@ -68,6 +68,12 @@
         <button type ="submit">Back to Dashboard</button>
     </form>
 
+    <form action="/download" method="POST">
+        <input type="hidden" name="pid">
+        <input type="hidden" name="pname">
+        <button type ="submit">Download Poll Results</button>
+    </form>
+
     <div class="chart-wrapper"><h2>Total Number of Responses:<span id="tot"></span></h2></div>
     <div class="chart-wrapper"><h2>Overall Results:</h2><canvas class="result" id="totals"></canvas></div>
     <div class="chart-wrapper"><h2>Results by Gender:</h2><canvas class="result" id="gender"></canvas></div>

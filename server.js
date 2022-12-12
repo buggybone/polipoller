@@ -294,6 +294,7 @@ app.post('/pollresultspage', (req, res) => {
                         'grapher("party",'+ parlabels +  ',' + parresults + ');'
                   );
       $('#tot').html(noResponses);
+      $('input[name="pid"]').val(req.body.polls);
       res.send($.html());
     }
   });
@@ -332,10 +333,6 @@ app.post('/sendpoll2', (req, res) => {
   res.sendFile(path.join(__dirname, '/sendpoll2.html'));
   var pid = req.body.pollid;
   var message = req.body.message;
-  //var scale = req.body.scale;
-  var scale = 2;
-  
-  var ac = req.body.ac;
 
   client.query('SELECT MAX(resp_id) FROM responses WHERE poll_id=$1;', [pid], (req1, res1) => {
     let min;
@@ -345,7 +342,10 @@ app.post('/sendpoll2', (req, res) => {
       min = 0;
     }
     
-    for(var i = 0; i < 50; i++){
+    var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
+
+    //these are pretend responses, delete for final version
+    for(var i = min; i < min + 50; i++){
       var resp = getRandomInt(3);
       var gen = getRandomInt(3);
       var age = getRandomInt(4);
@@ -354,18 +354,37 @@ app.post('/sendpoll2', (req, res) => {
       client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, i, resp, gen, age, eth, par], (req2, res2) => {});
     }
 
-    var fullmessage = message + "http://polipoller.herokuapp.com/pollpage?pid=" + pid + "&rid=";
-    for(var i = min; i < min + scale; i++){
-      
-      /*
-      client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, i, -1, -1, -1, -1, -1], (req2, res2) => {});
-      var fullermessage = fullmessage + String(i);
-      client2.messages.create({
-        body: fullermessage,
-        from: MY_NUMBER,
-        to: '+14257607569'
-      }); */
-    }
+    var testers = [['+14257607569',0], ['+14258701832',1], ['+19095833408',2]];
+    testers.map((element) => {
+      client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, element[1], -1, -1, -1, -1, -1], (req3, res3) => {});
+          var fullermessage = fullmessage + String(element[1]+min+50);
+          client2.messages.create({
+            body: fullermessage,
+            from: MY_NUMBER,
+            to: element[0]
+          });
+    });
+    //end segment to delete
+    
+    var sid = req.cookies['sessionID'];
+    client.query('SELECT user_id FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
+      uid = res1.rows[0].user_id;
+      client.query('SELECT phone FROM numbers WHERE user_id=$1', [uid], (err2, res2) => {
+        var theNumbers = [];
+        for(var i = 0; i < res2.rows.length; i++){
+          theNumbers.push([res2.rows[i].phone, min+53+i]); //change min+53+i to just min+i when pretend responses are deleted
+        }
+        theNumbers.map((element) => {
+          client.query('INSERT INTO responses VALUES ($1, $2, $3, $4, $5, $6, $7);', [pid, element[1], -1, -1, -1, -1, -1], (req3, res3) => {});
+          var fullermessage = fullmessage + String(element[1]);
+          client2.messages.create({
+            body: fullermessage,
+            from: MY_NUMBER,
+            to: element[0]
+          });
+        });
+      });
+    });
   });
 });
 
@@ -374,39 +393,150 @@ app.get('/upload', (req, res) => {
 });
 
 app.post('/upload', (req, res) => {
- /* if (!req.files) {
-    return res.status(400).send("No files were uploaded.");
-  }*/
-
-  var y = req.files.csv.data.toString().split('\n');
-  var pattern = '^[0-9]{10}$';
-  var toLoad = []
-  res.send('Success!');
-
-  var sid = req.cookies['sessionID'];
-  if(sid){
-    client.query('SELECT * FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
-      if(res1.rows.length == 0){
-        res.sendFile(path.join(__dirname+'/index.html'));
-      } else {
-        var uid = res1.rows[0].user_id;
-        for(var i = 0; i < y.length; i++){
-          if(y[i].match(pattern)){
-            toLoad.push('+1'+y[i].toString());
-          }
-        }
-        toLoad.map((element) => {
-          client.query('SELECT * FROM numbers WHERE user_id=$1 AND phone=$2;', [uid, element], (err3, res3) => {
-            if(res3.rows.length == 0){
-              client.query('INSERT INTO numbers VALUES ($1,$2);', [uid, element], (err4, res4)=>{});
-            }
-          });
-        });
-      }
-    });
+  if (!req.files) {
+    res.sendFile(path.join(__dirname+'/upload.html'));
   } else {
-    res.sendFile(path.join(__dirname+'/index.html'));
+    var y = req.files.csv.data.toString().split('\n');
+    var pattern = '^[0-9]{10}$';
+    var toLoad = [];
+    res.sendFile(path.join(__dirname+'/uploaded.html'));
+
+    var sid = req.cookies['sessionID'];
+    if(sid){
+      client.query('SELECT * FROM sessions WHERE session_key=$1', [sid], (err1, res1) => {
+        if(res1.rows.length == 0){
+          res.sendFile(path.join(__dirname+'/index.html'));
+        } else {
+          var uid = res1.rows[0].user_id;
+          for(var i = 0; i < y.length; i++){
+            if(y[i].match(pattern)){
+              toLoad.push('+1'+y[i].toString());
+            }
+          }
+          toLoad.map((element) => {
+            client.query('SELECT * FROM numbers WHERE user_id=$1 AND phone=$2;', [uid, element], (err3, res3) => {
+              if(res3.rows.length == 0){
+                client.query('INSERT INTO numbers VALUES ($1,$2);', [uid, element], (err4, res4)=>{});
+              }
+            });
+          });
+        }
+      });
+    } else {
+      res.sendFile(path.join(__dirname+'/index.html'));
+    }
   }
+});
+
+app.post('/download', (req, res) => {
+  res.type('text/csv');
+  
+  let filename;
+  client.query('SELECT poll_name FROM polls WHERE poll_id=$1', [req.body.pid], (err1, res1) =>{
+    filename = res1.rows[0].poll_name;
+  });
+
+
+  var csv = 'response, gender, age, ethnicity, party\n';
+  client.query('SELECT * FROM responses WHERE poll_id=$1', [req.body.pid], (err1, res1) => {
+    for(var i = 0; i < res1.rows.length; i++){
+      let resp;
+      let gender;
+      let age;
+      let ethnicity;
+      let party;
+
+      switch (res1.rows[i].resp) {
+        case 0:
+          resp = 'Yes';
+          break;
+        case 1:
+          resp = 'No';
+          break;
+        case 6:
+          resp = 'Prefer To Not Respond';
+          break;
+        default:
+          resp = 'No Response';
+      }
+
+      switch (res1.rows[i].gender) {
+        case 0:
+          gender = 'Male';
+          break;
+        case 1:
+          gender = 'Female';
+          break;
+        case 2:
+          gender = 'Non-Binary';
+          break;
+        default:
+          gender = 'No Response';
+      }
+
+      switch (res1.rows[i].age) {
+        case 0:
+          age = '18-24';
+          break;
+        case 1:
+          age = '25-39';
+          break;
+        case 2:
+          age = '40-64';
+          break;
+        case 3:
+          age = '65+';
+          break;
+        default:
+          age = 'No Response';
+      }
+
+      switch (res1.rows[i].ethnicity) {
+        case 0:
+          ethnicity = 'Asian/Pacific Islander';
+          break;
+        case 1:
+          ethnicity = 'Black or African American';
+          break;
+        case 2:
+          ethnicity = 'Hispanic or Latino';
+          break;
+        case 3:
+          ethnicity = 'Native American or American Indian';
+          break;
+        case 4:
+          ethnicity = 'White';
+          break;
+        case 5:
+          ethnicity = 'Other';
+          break;
+        default:
+          ethnicity = 'No Response';
+      }
+
+      switch (res1.rows[i].party) {
+        case 0:
+          party = 'Democratic';
+          break;
+        case 1:
+          party = 'Republican';
+          break;
+        case 2:
+          party = 'Other';
+          break;
+        default:
+          party = 'No Response';
+      }
+
+      if(resp == 'No Response'){
+        continue;
+      }
+
+      csv += resp + ',' + gender + ',' + age + ',' + ethnicity + ',' + party + '\n';
+    }
+    res.attachment(filename + '.csv').send(csv);
+  }); 
+
 });
 
 app.listen(process.env.PORT || 3000);
